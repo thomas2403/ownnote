@@ -48,7 +48,7 @@ class Backend {
 
 	public function checkEvernote($folder, $file) {
 		$html = "";
-		if ($html = \OCP\Files\Storage\IStorage::file_get_contents($folder."/".$file)) {
+		if ($html = \OC\Files\Filesystem::file_get_contents($folder."/".$file)) {
 			$DOM = new DOMDocument;
 			$DOM->loadHTML($html);
 			$items = $DOM->getElementsByTagName('meta');
@@ -78,7 +78,7 @@ class Backend {
 							if ($attr->name == "src") {
 								$url = $attr->value;
 								if (!$this->startsWith($url, "http") && !$this->startsWith($url, "/") && !$this->startsWith($url,"data")) {
-									if ($data = \OCP\Files\Storage\IStorage::file_get_contents($folder."/".$url)) {
+									if ($data = \OC\Files\Filesystem::file_get_contents($folder."/".$url)) {
 										$type = pathinfo($url, PATHINFO_EXTENSION);
 										$base64 = "data:image/".$type.";base64,".base64_encode($data);
 										$html = str_replace($url, $base64, $html);
@@ -177,7 +177,7 @@ class Backend {
 		if ($FOLDER != '') {
 			// Create the folder if it doesn't exist
 			if (!\OC\Files\Filesystem::is_dir($FOLDER)) {
-				if (!\OCP\Files\Storage\IStorage::mkdir($FOLDER)) {
+				if (!\OC\Files\Filesystem::mkdir($FOLDER)) {
 					echo "ERROR: Could not create ownNote directory.";
 					exit;
 				}
@@ -222,7 +222,7 @@ class Backend {
 										if ($result['mtime'] < $info['mtime']) {
 											// File is newer, this could happen if a user updates a file
 											$html = "";
-											$html = \OCP\Files\Storage\IStorage::file_get_contents($FOLDER."/".$tmpfile);
+											$html = \OC\Files\Filesystem::file_get_contents($FOLDER."/".$tmpfile);
 											$this->saveNote('', $result['name'], $result['grouping'], $html, $info['mtime']);
 											$requery = true;
 										}
@@ -230,7 +230,7 @@ class Backend {
 						if (! $fileindb) {
 							// If it's not in the DB, add it.
 							$html = "";
-							if ($html = \OCP\Files\Storage\IStorage::file_get_contents($FOLDER."/".$tmpfile)) {
+							if ($html = \OC\Files\Filesystem::file_get_contents($FOLDER."/".$tmpfile)) {
 							} else {
 								$html = "";
 							}
@@ -240,8 +240,8 @@ class Backend {
 						// We moved the rename down here to overcome the OC issue
 						if ($this->endsWith($tmpfile, ".html")) {
 							$tmpfile = substr($tmpfile,0,-1);
-							if (!\OCP\Files\Storage\IStorage::file_exists($FOLDER."/".$tmpfile)) {
-								\OCP\Files\Storage\IStorage::rename($FOLDER."/".$file, $FOLDER."/".$tmpfile);
+							if (!\OC\Files\Filesystem::file_exists($FOLDER."/".$tmpfile)) {
+								\OC\Files\Filesystem::rename($FOLDER."/".$file, $FOLDER."/".$tmpfile);
 							}
 						}
 					}
@@ -322,8 +322,8 @@ class Backend {
 				$tmpfile = $FOLDER."/".$name.".htm";
 				if ($group != '')
 					$tmpfile = $FOLDER."/[".$group."] ".$name.".htm";
-				if (!\OCP\Files\Storage\IStorage::file_exists($tmpfile)) {
-					\OCP\Files\Storage\IStorage::touch($tmpfile);
+				if (!\OC\Files\Filesystem::file_exists($tmpfile)) {
+					\OC\Files\Filesystem::touch($tmpfile);
 				}
 				if ($info = \OC\Files\Filesystem::getFileInfo($tmpfile)) {
 					$mtime = $info['mtime'];
@@ -353,8 +353,8 @@ class Backend {
 			$tmpfile = $FOLDER."/".$name.".htm";
 			if ($group != '')
 				$tmpfile = $FOLDER."/[".$group."] ".$name.".htm";
-			if (\OCP\Files\Storage\IStorage::file_exists($tmpfile))
-				\OCP\Files\Storage\IStorage::unlink($tmpfile);
+			if (\OC\Files\Filesystem::file_exists($tmpfile))
+				\OC\Files\Filesystem::unlink($tmpfile);
 		}
 		return "DONE";
 	}
